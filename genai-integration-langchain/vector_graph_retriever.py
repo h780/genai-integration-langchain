@@ -34,8 +34,9 @@ class State(TypedDict):
 # Connect to Neo4j
 graph = Neo4jGraph(
     url=os.getenv("NEO4J_URI"),
-    username=os.getenv("NEO4J_USERNAME"), 
+    username=os.getenv("NEO4J_USERNAME"),
     password=os.getenv("NEO4J_PASSWORD"),
+    database=os.getenv("NEO4J_DATABASE"),
 )
 # end::graph[]
 
@@ -43,7 +44,7 @@ graph = Neo4jGraph(
 embedding_model = OpenAIEmbeddings(model="text-embedding-ada-002")
 
 # Define the retrieval query
-# retrieval_query = 
+# retrieval_query =
 
 # Create Vector
 plot_vector = Neo4jVector.from_existing_index(
@@ -56,11 +57,11 @@ plot_vector = Neo4jVector.from_existing_index(
 
 # Define functions for each step in the application
 
-# Retrieve context 
+# Retrieve context
 def retrieve(state: State):
     # Use the vector to find relevant documents
     context = plot_vector.similarity_search(
-        state["question"], 
+        state["question"],
         k=6,
     )
     return {"context": context}

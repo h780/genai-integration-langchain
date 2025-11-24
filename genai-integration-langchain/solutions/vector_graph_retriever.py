@@ -34,8 +34,9 @@ class State(TypedDict):
 # Connect to Neo4j
 graph = Neo4jGraph(
     url=os.getenv("NEO4J_URI"),
-    username=os.getenv("NEO4J_USERNAME"), 
+    username=os.getenv("NEO4J_USERNAME"),
     password=os.getenv("NEO4J_PASSWORD"),
+    database=os.getenv("NEO4J_DATABASE"),
 )
 
 # Create the embedding model
@@ -46,9 +47,9 @@ embedding_model = OpenAIEmbeddings(model="text-embedding-ada-002")
 retrieval_query = """
 MATCH (node)<-[r:RATED]-()
 WITH node, score, avg(r.rating) AS userRating
-RETURN 
-    "Title: " + node.title + ", Plot: " + node.plot AS text, 
-    score, 
+RETURN
+    "Title: " + node.title + ", Plot: " + node.plot AS text,
+    score,
     {
         title: node.title,
         genres: [ (node)-[:IN_GENRE]->(g) | g.name ],
@@ -73,11 +74,11 @@ plot_vector = Neo4jVector.from_existing_index(
 
 # Define functions for each step in the application
 
-# Retrieve context 
+# Retrieve context
 def retrieve(state: State):
     # Use the vector to find relevant documents
     context = plot_vector.similarity_search(
-        state["question"], 
+        state["question"],
         k=6,
     )
     return {"context": context}

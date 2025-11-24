@@ -10,20 +10,21 @@ from langchain_core.prompts.prompt import PromptTemplate
 # end::import_prompt[]
 
 model = init_chat_model(
-    "gpt-4o", 
+    "gpt-4o",
     model_provider="openai"
 )
 
 cypher_model = init_chat_model(
-    "gpt-4o-mini", 
+    "gpt-4o-mini",
     model_provider="openai",
     temperature=0.0
 )
 
 graph = Neo4jGraph(
     url=os.getenv("NEO4J_URI"),
-    username=os.getenv("NEO4J_USERNAME"), 
+    username=os.getenv("NEO4J_USERNAME"),
     password=os.getenv("NEO4J_PASSWORD"),
+    database=os.getenv("NEO4J_DATABASE"),
 )
 
 # tag::cypher_template[]
@@ -115,15 +116,15 @@ The question is:
 
 # tag::cypher_prompt[]
 cypher_prompt = PromptTemplate(
-    input_variables=["schema", "question"], 
+    input_variables=["schema", "question"],
     template=cypher_template
 )
 # end::cypher_prompt[]
 
 # tag::cypher_qa[]
 cypher_qa = GraphCypherQAChain.from_llm(
-    graph=graph, 
-    llm=model, 
+    graph=graph,
+    llm=model,
     cypher_llm=cypher_model,
     cypher_prompt=cypher_prompt,
     allow_dangerous_requests=True,

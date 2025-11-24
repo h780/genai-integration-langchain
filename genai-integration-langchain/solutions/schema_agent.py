@@ -14,8 +14,9 @@ from langchain_neo4j import Neo4jGraph
 # Connect to Neo4j
 graph = Neo4jGraph(
     url=os.getenv("NEO4J_URI"),
-    username=os.getenv("NEO4J_USERNAME"), 
+    username=os.getenv("NEO4J_USERNAME"),
     password=os.getenv("NEO4J_PASSWORD"),
+    database=os.getenv("NEO4J_DATABASE"),
 )
 # end::neo4jgraph[]
 
@@ -43,7 +44,7 @@ class State(TypedDict):
 # Define functions for each step in the application
 
 # tag::retrieve[]
-# Retrieve context 
+# Retrieve context
 def retrieve(state: State):
     context = graph.query("CALL db.schema.visualization()")
     return {"context": context}

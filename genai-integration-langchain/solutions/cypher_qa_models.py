@@ -7,13 +7,13 @@ from langchain_neo4j import GraphCypherQAChain
 from langchain.chat_models import init_chat_model
 
 model = init_chat_model(
-    "gpt-4o", 
+    "gpt-4o",
     model_provider="openai"
 )
 
 # tag::cypher_model[]
 cypher_model = init_chat_model(
-    "gpt-4o", 
+    "gpt-4o",
     model_provider="openai",
     temperature=0.0
 )
@@ -21,14 +21,15 @@ cypher_model = init_chat_model(
 
 graph = Neo4jGraph(
     url=os.getenv("NEO4J_URI"),
-    username=os.getenv("NEO4J_USERNAME"), 
+    username=os.getenv("NEO4J_USERNAME"),
     password=os.getenv("NEO4J_PASSWORD"),
+    database=os.getenv("NEO4J_DATABASE"),
 )
 
 # tag::cypher_qa[]
 cypher_qa = GraphCypherQAChain.from_llm(
-    graph=graph, 
-    llm=model, 
+    graph=graph,
+    llm=model,
     cypher_llm=cypher_model,
     allow_dangerous_requests=True,
     verbose=True,

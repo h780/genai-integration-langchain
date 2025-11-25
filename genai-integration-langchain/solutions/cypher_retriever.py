@@ -36,15 +36,16 @@ class State(TypedDict):
 # Connect to Neo4j
 graph = Neo4jGraph(
     url=os.getenv("NEO4J_URI"),
-    username=os.getenv("NEO4J_USERNAME"), 
+    username=os.getenv("NEO4J_USERNAME"),
     password=os.getenv("NEO4J_PASSWORD"),
+    database=os.getenv("NEO4J_DATABASE"),
 )
 
 # tag::cypher_qa[]
 # Create the Cypher QA chain
 cypher_qa = GraphCypherQAChain.from_llm(
-    graph=graph, 
-    llm=model, 
+    graph=graph,
+    llm=model,
     allow_dangerous_requests=True,
     return_direct=True,
 )
@@ -53,7 +54,7 @@ cypher_qa = GraphCypherQAChain.from_llm(
 # Define functions for each step in the application
 
 # tag::retrieve[]
-# Retrieve context 
+# Retrieve context
 def retrieve(state: State):
     context = cypher_qa.invoke(
         {"query": state["question"]}

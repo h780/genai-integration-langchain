@@ -34,8 +34,9 @@ class State(TypedDict):
 # Connect to Neo4j
 graph = Neo4jGraph(
     url=os.getenv("NEO4J_URI"),
-    username=os.getenv("NEO4J_USERNAME"), 
+    username=os.getenv("NEO4J_USERNAME"),
     password=os.getenv("NEO4J_PASSWORD"),
+    database=os.getenv("NEO4J_DATABASE"),
 )
 
 cypher_template = """Task:Generate Cypher statement to query a graph database.
@@ -63,14 +64,14 @@ The question is:
 {question}"""
 
 cypher_prompt = PromptTemplate(
-    input_variables=["schema", "question"], 
+    input_variables=["schema", "question"],
     template=cypher_template
 )
 
 # Create the Cypher QA chain
 cypher_qa = GraphCypherQAChain.from_llm(
-    graph=graph, 
-    llm=model, 
+    graph=graph,
+    llm=model,
     cypher_prompt=cypher_prompt,
     allow_dangerous_requests=True,
     verbose=True,
@@ -79,7 +80,7 @@ cypher_qa = GraphCypherQAChain.from_llm(
 # Define functions for each step in the application
 
 # tag::retrieve[]
-# Retrieve context 
+# Retrieve context
 def retrieve(state: State):
     context = cypher_qa.invoke(
         {"query": state["question"]}

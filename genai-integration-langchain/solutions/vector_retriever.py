@@ -44,8 +44,9 @@ class State(TypedDict):
 # Connect to Neo4j
 graph = Neo4jGraph(
     url=os.getenv("NEO4J_URI"),
-    username=os.getenv("NEO4J_USERNAME"), 
+    username=os.getenv("NEO4J_USERNAME"),
     password=os.getenv("NEO4J_PASSWORD"),
+    database=os.getenv("NEO4J_DATABASE"),
 )
 # end::graph[]
 
@@ -68,11 +69,11 @@ plot_vector = Neo4jVector.from_existing_index(
 # Define functions for each step in the application
 
 # tag::retrieve[]
-# Retrieve context 
+# Retrieve context
 def retrieve(state: State):
     # Use the vector to find relevant documents
     context = plot_vector.similarity_search(
-        state["question"], 
+        state["question"],
         k=6
     )
     return {"context": context}

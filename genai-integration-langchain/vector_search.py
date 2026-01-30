@@ -13,9 +13,31 @@ graph = Neo4jGraph(
 )
 
 # Create the embedding model
+from langchain_openai import OpenAIEmbeddings
+embedding_model = OpenAIEmbeddings(model="text-embedding-ada-002")
 
 # Create Vector
-
+from langchain_neo4j import Neo4jVector
+plot_vector = Neo4jVector.from_existing_index(embedding_model,
+                                              graph=graph,
+                                              index_name="moviePlots",
+                                              embedding_node_property="plotEmbedding",
+                                              text_node_property="plot",
+                                            )
 # Search for similar movie plots
+plot = "Love conquers all"
+result = plot_vector.similarity_search(plot, k=3)
+print(result)
 
 # Parse the documents
+for doc in result:
+    print(f"Title: {doc.metadata['title']}")
+    print(f"Plot: {doc.page_content}\n")
+
+result = plot_vector.similarity_search(
+    plot,
+    k=3,
+    filter={"revenue": {"$gte": 200000000}}
+)
+
+print(result)

@@ -44,7 +44,21 @@ graph = Neo4jGraph(
 embedding_model = OpenAIEmbeddings(model="text-embedding-ada-002")
 
 # Define the retrieval query
-# retrieval_query =
+# Define the retrieval query
+retrieval_query = """
+MATCH (node)<-[r:RATED]-()
+WITH node, score, avg(r.rating) AS userRating
+RETURN
+    "Title: " + node.title + ", Plot: " + node.plot AS text,
+    score,
+    {
+        title: node.title,
+        genres: [ (node)-[:IN_GENRE]->(g) | g.name ],
+        actors: [ (person)-[r:ACTED_IN]->(node) | [person.name, r.role] ],
+        userRating: userRating
+    } AS metadata
+ORDER BY userRating DESC
+"""
 
 # Create Vector
 plot_vector = Neo4jVector.from_existing_index(
@@ -53,6 +67,7 @@ plot_vector = Neo4jVector.from_existing_index(
     index_name="moviePlots",
     embedding_node_property="plotEmbedding",
     text_node_property="plot",
+    retrieval_query=retrieval_query,
 )
 
 # Define functions for each step in the application
@@ -83,3 +98,12 @@ response = app.invoke({"question": question})
 print("Answer:", response["answer"])
 print("Context:", response["context"])
 
+question = "What are top user rated movies about a house haunted by ghosts?"
+response = app.invoke({"question": question})
+print("Answer:", response["answer"])
+print("Context:", response["context"])
+
+question = "What movies genres relate to movies about betrayal?"
+response = app.invoke({"question": question})
+print("Answer:", response["answer"])
+print("Context:", response["context"])

@@ -8,7 +8,15 @@ from langchain_core.prompts import PromptTemplate
 from typing_extensions import List, TypedDict
 
 # Connect to Neo4j
-# graph = 
+from langchain_neo4j import Neo4jGraph
+
+# Connect to Neo4j
+graph = Neo4jGraph(
+    url=os.getenv("NEO4J_URI"),
+    username=os.getenv("NEO4J_USERNAME"),
+    password=os.getenv("NEO4J_PASSWORD"),
+    database=os.getenv("NEO4J_DATABASE"),
+)
 
 # Initialize the LLM
 model = init_chat_model("gpt-4o", model_provider="openai")
@@ -33,11 +41,9 @@ class State(TypedDict):
 
 # Define functions for each step in the application
 
-# Retrieve context 
+# Retrieve context
 def retrieve(state: State):
-    context = [
-        {"data": "None"}
-    ]
+    context = graph.query("CALL db.schema.visualization()")
     return {"context": context}
 
 # Generate the answer based on the question and context
@@ -52,6 +58,6 @@ workflow.add_edge(START, "retrieve")
 app = workflow.compile()
 
 # Run the application
-question = "What data is in the context?"
+question = "How would I find user ratings for a movie?"
 response = app.invoke({"question": question})
 print("Answer:", response["answer"])
